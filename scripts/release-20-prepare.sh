@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -eEuo pipefail
+
+THIS_DIR="$(dirname "$(realpath "$0")")"
+
+. "${THIS_DIR}/common.sh"
+
+### prepareCmd
+#
+#| Command property | Description                                                                                                         |
+#| ---------------- | ------------------------------------------------------------------------------------------------------------------- |
+#| `exit code`      | Any non `0` code is considered as an unexpected error and will stop the `semantic-release` execution with an error. |
+#| `stdout`         | Can be used for logging.                                                                                            |
+#| `stderr`         | Can be used for logging.                                                                                            |
+
+[[ -z "${VERSION_TAG+x}" ]] && >&2 echo "VERSION_TAG is not set" && exit 2
+[[ -z "${NUGET_PUBLISH_API_KEY+x}" ]] && >&2 echo "NUGET_PUBLISH_API_KEY is not set" && exit 2
+
+DIRS=(
+publish-nuget
+)
+RETURN=0
+
+for dir in "${DIRS[@]}"
+do
+    if [[ ! -d "${dir}" ]]; then
+      >&2 echo "${dir} directory does not exist"
+      RETURN=2
+    fi
+done
+
+exit $RETURN

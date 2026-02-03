@@ -1,0 +1,115 @@
+name: .NET Release
+
+concurrency:
+  group: "release-${{ github.ref }}"
+  cancel-in-progress: false
+
+permissions:
+  contents: write       # for publishing a GitHub release and creating release backpropagation PRs
+  issues: write         # for commenting on released issues
+  pull-requests: write  # for commenting on released pull requests and creating release backpropagation PRs
+  packages: write       # for publishing packages in repository registry
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      dry_run:
+        description: "Dry run?"
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      NUGET_USER:
+        required: true
+        description: "An API key for publishing to NuGet.org"
+    outputs:
+      new_version:
+        description: "Newly published version"
+        value: ${{ jobs.release.outputs.new_version }}
+      new_tag:
+        description: "New tag"
+        value: ${{ jobs.release.outputs.new_tag }}
+      last_version:
+        description: "Previously published version"
+        value: ${{ jobs.release.outputs.last_version }}
+      last_tag:
+        description: "Previous version tag"
+        value: ${{ jobs.release.outputs.last_tag }}
+
+env:
+  # https://github.com/actions/setup-dotnet?tab=readme-ov-file#reduce-caching-size
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  REGISTRY: ghcr.io
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-tags: true
+
+    # Get a short-lived NuGet API key
+    - name: NuGet login (OIDC → temp API key)
+      uses: NuGet/login@v1
+      id: nuget-login
+      with:
+        user: Arkanis
+
+      - name: Setup .NET
+        id: setup-dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - run: echo "Using .NET ${{ steps.setup-dotnet.outputs.dotnet-version }}"
+
+      - run: echo "Cache hit - ${{ steps.setup-dotnet.outputs.cache-hit }}"
+
+      - name: Restore dependencies
+        run: dotnet tool restore
+
+      - name: Restore dependencies
+        run: dotnet restore --locked-mode
+
+      # determines whether a new version release is mandated
+      # if it is, publish scripts are run and new version is tagged and published
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        id: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUGET_PUBLISH_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+          DEBUG: ${{ inputs.dry_run && '*' || '' }}
+        with:
+          ci: ${{ ! inputs.dry_run }}
+          dry_run: ${{ inputs.dry_run }}
+          semantic_version: 25.0.2
+          extra_plugins: |
+            @semantic-release/changelog@6.0.3
+            @semantic-release/exec@7.0.3
+
+      - run: echo "New release - ${{ steps.semantic-release.outputs.new_release_version || 'no new release' }}"
+
+      - name: Setup Version Backpropagation PR
+        if: ${{ ! inputs.dry_run && steps.semantic-release.outputs.new_release_version && github.ref == 'refs/heads/release/stable' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_URL=$(gh pr new --base ${{ github.event.repository.default_branch }} --head ${{ github.ref_name }} --title "Backpropagate release version to default branch: ${{ steps.semantic-release.outputs.new_release_version }}" --body "This is an automated post-release action." --label ci --label automated)
+          PR_NUMBER=${PR_URL##*/}
+          gh pr merge --merge --auto ${PR_URL}
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.PR_AUTOMATION_PAT }}" \
+            -H "Accept: application/vnd.github+json" \
+            "${{ github.api_url }}/repos/${{ github.repository }}/pulls/${PR_NUMBER}/reviews" \
+            -d '{"event":"APPROVE"}'
+
+    outputs:
+      new_version: ${{ steps.semantic-release.outputs.new_release_version }}
+      new_tag: ${{ steps.semantic-release.outputs.new_release_git_tag }}
+      last_version: ${{ steps.semantic-release.outputs.last_release_version }}
+      last_tag: ${{ steps.semantic-release.outputs.last_release_git_tag }}

@@ -1,0 +1,38 @@
+<Project>
+    <PropertyGroup>
+        <LangVersion>preview</LangVersion>
+        <AnalysisLevel>preview</AnalysisLevel>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <NoWarn>
+            $(NoWarn);
+            CA1707; <!-- Identifiers should not contain underscores -->
+        </NoWarn>
+        <WarningsNotAsErrors>
+            $(WarningsNotAsErrors);
+        </WarningsNotAsErrors>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PublisherName>Arkanis Corporation</PublisherName>
+        <Company>Arkanis Corporation</Company>
+        <Authors>FatalMerlin, TheKronnY and contributors</Authors>
+        <Copyright>Copyright © $([System.DateTime]::Now.Year) FatalMerlin, TheKronnY and contributors</Copyright>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <UseArtifactsOutput>true</UseArtifactsOutput>
+        <!-- https://github.com/actions/setup-dotnet?tab=readme-ov-file#caching-nuget-packages -->
+        <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+        <!-- Use package version lock file to ensure consistent package versions across builds -->
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="$(PackageId).UnitTests"/>
+        <InternalsVisibleTo Include="$(PackageId).IntegrationTests"/>
+    </ItemGroup>
+</Project>
