@@ -51,12 +51,12 @@ jobs:
         with:
           fetch-tags: true
 
-    # Get a short-lived NuGet API key
-    - name: NuGet login (OIDC → temp API key)
-      uses: NuGet/login@v1
-      id: nuget-login
-      with:
-        user: Arkanis
+      # Get a short-lived NuGet API key
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: Arkanis
 
       - name: Setup .NET
         id: setup-dotnet
