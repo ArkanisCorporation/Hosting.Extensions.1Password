@@ -56,7 +56,7 @@ jobs:
         uses: NuGet/login@v1
         id: nuget-login
         with:
-          user: Arkanis
+          user: ${{ secrets.NUGET_USER }}
 
       - name: Setup .NET
         id: setup-dotnet
