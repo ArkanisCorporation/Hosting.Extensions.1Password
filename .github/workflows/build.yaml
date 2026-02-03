@@ -16,11 +16,6 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
 jobs:
-  build-and-publish:
-    permissions:
-      id-token: write  # enable GitHub OIDC token issuance for this job
-
-steps:
   test:
     name: Tests
     uses: ./.github/workflows/_test.yaml
@@ -29,6 +24,8 @@ steps:
     name: Release
     needs: test
     uses: ./.github/workflows/_release.yaml
+    permissions:
+      id-token: write  # enable GitHub OIDC token issuance for this job
     secrets:
       NUGET_USER: ${{ secrets.NUGET_USER }}
     with:
