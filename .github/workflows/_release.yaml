@@ -5,10 +5,10 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
+  id-token: write       # enable GitHub OIDC token issuance for this job
   contents: write       # for publishing a GitHub release and creating release backpropagation PRs
   issues: write         # for commenting on released issues
   pull-requests: write  # for commenting on released pull requests and creating release backpropagation PRs
-  packages: write       # for publishing packages in repository registry
 
 on:
   workflow_dispatch:
