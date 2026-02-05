@@ -3,7 +3,7 @@
 **Seamlessly integrate 1Password secrets into your .NET applications during development.**
 
 [![NuGet](https://img.shields.io/nuget/v/Arkanis.Hosting.Extensions.1Password.svg)](https://www.nuget.org/packages/Arkanis.Hosting.Extensions.1Password/)
-[![License](https://img.shields.io/github/license/ArkanisCorporation/Hosting.Extensions.1Password.svg)](LICENSE.md)
+[![License](https://img.shields.io/github/license/ArkanisCorporation/Hosting.Extensions.1Password)](LICENSE.md)
 
 ---
 
