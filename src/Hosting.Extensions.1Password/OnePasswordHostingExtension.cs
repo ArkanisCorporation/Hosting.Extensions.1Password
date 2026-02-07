@@ -15,8 +15,6 @@ namespace Arkanis.Hosting.Extensions._1Password
     /// </summary>
     public static class OnePasswordHostingExtension
     {
-        private static readonly char[] EqualsSeparator = { '=' };
-
         /// <summary>
         /// Internal factory for creating IOpCliInvoker instances. Used for testing.
         /// </summary>
@@ -68,7 +66,7 @@ namespace Arkanis.Hosting.Extensions._1Password
             foreach (var line in result.StandardOutput.Split("\n").Where(line => !string.IsNullOrWhiteSpace(line)))
             {
                 // Split into max 2 parts to handle values containing "="
-                var parts = line.Split(EqualsSeparator, 2);
+                var parts = line.Split('=',2);
                 if (parts.Length != 2)
                 {
                     if (failSilently)
@@ -118,7 +116,7 @@ namespace Arkanis.Hosting.Extensions._1Password
             {
                 if (section.Value is { } s && s.StartsWith("op://", StringComparison.OrdinalIgnoreCase))
                 {
-                    opSections.Add(section.Key, section);
+                    opSections.Add(section.Path.Replace(':','_'), section);
                 }
                 else
                 {
