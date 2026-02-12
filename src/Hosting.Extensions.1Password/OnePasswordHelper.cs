@@ -6,6 +6,7 @@ namespace Arkanis.Hosting.Extensions._1Password
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using CliWrap.Buffered;
     using Microsoft.Extensions.Configuration;
 
 
@@ -18,7 +19,7 @@ namespace Arkanis.Hosting.Extensions._1Password
 
         public static async Task Replace1PasswordConfigurationItems(Dictionary<string, IConfigurationSection> opSections, OnePasswordOptions options)
         {
-            var parser = options.ResponseParser ?? new OnePasswordResponseParser(options);
+            var parser = GetResponseParser(options);
             var opTemplate = string.Join(
                 "\n",
                 opSections.Values
@@ -26,33 +27,12 @@ namespace Arkanis.Hosting.Extensions._1Password
                     .Select(parser.CreateResultTemplate)
             );
 
-            var invoker = options.CliInvoker ?? InvokerFactory?.Invoke() ?? new OpCliInvoker();
+            var invoker = GetCliInvoker(options);
             var result = await invoker.InvokeAsync(options.Account, opTemplate);
+            ValidateInvokerResult(result, options);
 
-            if (!result.IsSuccess)
+            foreach (var pair in ProcessResults(result, parser))
             {
-                if (options.FailSilently)
-                {
-                    return;
-                }
-
-                throw new OnePasswordCliException(
-                    "Failed to resolve secrets from 1Password. "
-                    + "Ensure the 1Password CLI ('op') is installed and you are authenticated. "
-                    + "Run 'op signin' to authenticate or check 'op --version' to verify installation."
-                    + $"\nSTDERR:\n{result.StandardError}",
-                    result.ExitCode,
-                    result.StandardError
-                );
-            }
-
-            foreach (var line in result.StandardOutput.Split('\n', StringSplitOptions.RemoveEmptyEntries))
-            {
-                if (!(parser.ParseResult(line) is { } pair))
-                {
-                    continue;
-                }
-
                 // Only update if the key exists in our sections dictionary
                 if (opSections.TryGetValue(pair.Key, out var section))
                 {
@@ -60,6 +40,58 @@ namespace Arkanis.Hosting.Extensions._1Password
                 }
             }
         }
+
+        public static async Task<string> Resolve1PasswordItem(string key, OnePasswordOptions options)
+        {
+            const string resultKey = "VALUE";
+
+            var parser = GetResponseParser(options);
+            var template = parser.CreateResultTemplate(KeyValuePair.Create(resultKey, key));
+
+            var invoker = GetCliInvoker(options);
+            var result = await invoker.InvokeAsync(options.Account, template);
+            ValidateInvokerResult(result, options);
+
+            return ProcessResults(result, parser)
+                .Single(x => x.Key == resultKey)
+                .Value;
+        }
+
+        private static IEnumerable<KeyValuePair<string, string>> ProcessResults(BufferedCommandResult result, IOnePasswordResponseParser parser)
+        {
+            foreach (var line in result.StandardOutput.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (!(parser.ParseResult(line) is { } pair))
+                {
+                    continue;
+                }
+
+                yield return pair;
+            }
+        }
+
+        private static void ValidateInvokerResult(BufferedCommandResult result, OnePasswordOptions options)
+        {
+            if (result.IsSuccess || options.FailSilently)
+            {
+                return;
+            }
+
+            throw new OnePasswordCliException(
+                "Failed to resolve secrets from 1Password. "
+                + "Ensure the 1Password CLI ('op') is installed and you are authenticated. "
+                + "Run 'op signin' to authenticate or check 'op --version' to verify installation."
+                + $"\nSTDERR:\n{result.StandardError}",
+                result.ExitCode,
+                result.StandardError
+            );
+        }
+
+        private static IOpCliInvoker GetCliInvoker(OnePasswordOptions options)
+            => options.CliInvoker ?? InvokerFactory?.Invoke() ?? new OpCliInvoker();
+
+        private static IOnePasswordResponseParser GetResponseParser(OnePasswordOptions options)
+            => options.ResponseParser ?? new OnePasswordResponseParser(options);
 
         public static Dictionary<string, IConfigurationSection> GetOpConfigurationSections(
             IConfigurationManager configurationManager,
