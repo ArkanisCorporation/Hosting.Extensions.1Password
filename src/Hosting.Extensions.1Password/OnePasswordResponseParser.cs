@@ -2,6 +2,7 @@
 namespace Arkanis.Hosting.Extensions._1Password
 #pragma warning restore CA1707
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -40,8 +41,9 @@ namespace Arkanis.Hosting.Extensions._1Password
         public KeyValuePair<string, string>? ParseResult(string source)
         {
             // Split into max 2 parts to handle values containing "="
-            var parts = source.Split(Separator, 2);
-            if (parts.Length != 2)
+            var sourceSpan = source.AsSpan();
+            var separatorIndex = sourceSpan.IndexOf(Separator);
+            if (separatorIndex == -1)
             {
                 if (_options.FailSilently)
                 {
@@ -53,8 +55,8 @@ namespace Arkanis.Hosting.Extensions._1Password
                 throw new OnePasswordResultException($"Received malformed output from 1Password CLI. Expected '{expectedFormat}' format but got: {source}");
             }
 
-            var key = parts[0];
-            var value = parts[1];
+            var key = sourceSpan[..separatorIndex];
+            var value = sourceSpan[(separatorIndex + 1)..];
 
             // Remove surrounding quotes if present
             if (value.Length >= 2 && value[0] == '"' && value[^1] == '"')
@@ -62,7 +64,7 @@ namespace Arkanis.Hosting.Extensions._1Password
                 value = value[1..^1];
             }
 
-            return KeyValuePair.Create(key, value);
+            return KeyValuePair.Create(key.ToString(), value.ToString());
         }
     }
 }
