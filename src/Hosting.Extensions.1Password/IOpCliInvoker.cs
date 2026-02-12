@@ -1,4 +1,6 @@
+#pragma warning disable CA1707
 namespace Arkanis.Hosting.Extensions._1Password
+#pragma warning restore CA1707
 {
     using System.Threading.Tasks;
     using CliWrap.Buffered;
@@ -6,7 +8,7 @@ namespace Arkanis.Hosting.Extensions._1Password
     /// <summary>
     /// Interface for invoking the 1Password CLI.
     /// </summary>
-    internal interface IOpCliInvoker
+    public interface IOpCliInvoker
     {
         /// <summary>
         /// Invokes the 1Password CLI to inject secrets into the provided template.

@@ -3,24 +3,24 @@
 using System;
 
 /// <summary>
-/// Unit tests for <see cref="OnePasswordHostingExtension"/>.
+/// Unit tests for <see cref="OnePasswordHelper"/>.
 /// </summary>
 [Collection("OnePasswordTests")]
-public class OnePasswordHostingExtensionTests : IDisposable
+public class OnePasswordHelperTests : IDisposable
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="OnePasswordHostingExtensionTests"/> class.
+    /// Initializes a new instance of the <see cref="OnePasswordHelperTests"/> class.
     /// </summary>
-    public OnePasswordHostingExtensionTests()
+    public OnePasswordHelperTests()
         // Clean state before each test
-        => OnePasswordHostingExtension.InvokerFactory = null;
+        => OnePasswordHelper.InvokerFactory = null;
 
     /// <summary>
     /// Cleans up after each test by resetting the invoker factory.
     /// </summary>
     public void Dispose()
     {
-        OnePasswordHostingExtension.InvokerFactory = null;
+        OnePasswordHelper.InvokerFactory = null;
         GC.SuppressFinalize(this);
     }
 
@@ -40,7 +40,7 @@ public class OnePasswordHostingExtensionTests : IDisposable
         var builder = new FakeHostApplicationBuilder(config);
 
         var fakeInvoker = new FakeOpCliInvoker("SecretA=\"valueA\"\nSecretB=\"valueB\"");
-        OnePasswordHostingExtension.InvokerFactory = () => fakeInvoker;
+        OnePasswordHelper.InvokerFactory = () => fakeInvoker;
 
         // Act
         await builder.Use1PasswordAsync();
@@ -61,7 +61,7 @@ public class OnePasswordHostingExtensionTests : IDisposable
 
         var builder = new FakeHostApplicationBuilder(config);
         var fakeInvoker = new FakeOpCliInvoker(string.Empty);
-        OnePasswordHostingExtension.InvokerFactory = () => fakeInvoker;
+        OnePasswordHelper.InvokerFactory = () => fakeInvoker;
 
         // Act
         await builder.Use1PasswordAsync();
@@ -81,7 +81,7 @@ public class OnePasswordHostingExtensionTests : IDisposable
 
         var builder = new FakeHostApplicationBuilder(config);
         var captured = new FakeOpCliInvoker(string.Empty);
-        OnePasswordHostingExtension.InvokerFactory = () => captured;
+        OnePasswordHelper.InvokerFactory = () => captured;
 
         // Act
         await builder.Use1PasswordAsync(account: "acct-1");
@@ -101,7 +101,7 @@ public class OnePasswordHostingExtensionTests : IDisposable
 
         var builder = new FakeHostApplicationBuilder(config);
         var fakeInvoker = new FakeOpCliInvoker("SecretQ=\"quoted\"");
-        OnePasswordHostingExtension.InvokerFactory = () => fakeInvoker;
+        OnePasswordHelper.InvokerFactory = () => fakeInvoker;
 
         // Act
         await builder.Use1PasswordAsync();
@@ -121,10 +121,10 @@ public class OnePasswordHostingExtensionTests : IDisposable
 
         var builder = new FakeHostApplicationBuilder(config);
         var fakeInvoker = new FakeOpCliInvoker("malformed-line-without-equals");
-        OnePasswordHostingExtension.InvokerFactory = () => fakeInvoker;
+        OnePasswordHelper.InvokerFactory = () => fakeInvoker;
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<OnePasswordException>(
+        var exception = await Assert.ThrowsAsync<OnePasswordResultException>(
             async () => await builder.Use1PasswordAsync()
         );
 
@@ -148,7 +148,7 @@ public class OnePasswordHostingExtensionTests : IDisposable
         var builder = new FakeHostApplicationBuilder(config);
         // Mix valid and malformed output
         var fakeInvoker = new FakeOpCliInvoker("SecretM=\"validValue\"\nmalformed-line\nSecretN=\"anotherValid\"");
-        OnePasswordHostingExtension.InvokerFactory = () => fakeInvoker;
+        OnePasswordHelper.InvokerFactory = () => fakeInvoker;
 
         // Act
         await builder.Use1PasswordAsync(failSilently: true);
@@ -169,10 +169,10 @@ public class OnePasswordHostingExtensionTests : IDisposable
 
         var builder = new FakeHostApplicationBuilder(config);
         var fakeInvoker = new FakeOpCliInvokerWithError(exitCode: 1, stderr: "CLI error message");
-        OnePasswordHostingExtension.InvokerFactory = () => fakeInvoker;
+        OnePasswordHelper.InvokerFactory = () => fakeInvoker;
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<OnePasswordException>(
+        var exception = await Assert.ThrowsAsync<OnePasswordCliException>(
             async () => await builder.Use1PasswordAsync()
         );
 
@@ -191,7 +191,7 @@ public class OnePasswordHostingExtensionTests : IDisposable
 
         var builder = new FakeHostApplicationBuilder(config);
         var fakeInvoker = new FakeOpCliInvokerWithError(exitCode: 1, stderr: "CLI error message");
-        OnePasswordHostingExtension.InvokerFactory = () => fakeInvoker;
+        OnePasswordHelper.InvokerFactory = () => fakeInvoker;
 
         // Act
         await builder.Use1PasswordAsync(failSilently: true);

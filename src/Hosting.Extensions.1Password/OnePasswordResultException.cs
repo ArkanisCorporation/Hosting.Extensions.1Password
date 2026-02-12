@@ -6,14 +6,14 @@ namespace Arkanis.Hosting.Extensions._1Password
     using JetBrains.Annotations;
 
     [PublicAPI]
-    public class OnePasswordException : Exception
+    public class OnePasswordResultException : OnePasswordException
     {
-        public OnePasswordException(string message)
+        public OnePasswordResultException(string message)
             : base(message)
         {
         }
 
-        public OnePasswordException(string message, Exception innerException)
+        public OnePasswordResultException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
