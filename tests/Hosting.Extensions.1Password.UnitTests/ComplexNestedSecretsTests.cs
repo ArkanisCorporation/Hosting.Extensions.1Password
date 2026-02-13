@@ -15,14 +15,14 @@ public class ComplexNestedSecretsTests : IDisposable
     /// </summary>
     public ComplexNestedSecretsTests()
         // Clean state before each test
-        => OnePasswordHostingExtension.InvokerFactory = null;
+        => OnePasswordHelper.InvokerFactory = null;
 
     /// <summary>
     /// Cleans up after each test by resetting the invoker factory.
     /// </summary>
     public void Dispose()
     {
-        OnePasswordHostingExtension.InvokerFactory = null;
+        OnePasswordHelper.InvokerFactory = null;
         GC.SuppressFinalize(this);
     }
 
@@ -44,9 +44,9 @@ public class ComplexNestedSecretsTests : IDisposable
         var builder = CreateHostApplicationBuilder(configuration);
 
         var mockInvoker = new FakeOpCliInvoker(
-            "Level1_Level2_Level3_Level4_Secret=\"resolved-secret-1\"\n" + "Level1_Level2_AnotherSecret=\"resolved-secret-2\""
+            "Level1:Level2:Level3:Level4:Secret=\"resolved-secret-1\"\n" + "Level1:Level2:AnotherSecret=\"resolved-secret-2\""
         );
-        OnePasswordHostingExtension.InvokerFactory = () => mockInvoker;
+        OnePasswordHelper.InvokerFactory = () => mockInvoker;
 
         // Act
         await builder.Use1PasswordAsync();
@@ -76,11 +76,11 @@ public class ComplexNestedSecretsTests : IDisposable
         var builder = CreateHostApplicationBuilder(configuration);
 
         var mockInvoker = new FakeOpCliInvoker(
-            "ConnectionStrings_Primary=\"Server=db1;User=user1\"\n"
-            + "ConnectionStrings_Secondary=\"Server=db2;User=user2\"\n"
-            + "ConnectionStrings_Tertiary=\"Server=db3;User=user3\""
+            "ConnectionStrings:Primary=\"Server=db1;User=user1\"\n"
+            + "ConnectionStrings:Secondary=\"Server=db2;User=user2\"\n"
+            + "ConnectionStrings:Tertiary=\"Server=db3;User=user3\""
         );
-        OnePasswordHostingExtension.InvokerFactory = () => mockInvoker;
+        OnePasswordHelper.InvokerFactory = () => mockInvoker;
 
         // Act
         await builder.Use1PasswordAsync();
@@ -114,12 +114,12 @@ public class ComplexNestedSecretsTests : IDisposable
         var builder = CreateHostApplicationBuilder(configuration);
 
         var mockInvoker = new FakeOpCliInvoker(
-            "Services_Database_Username=\"dbuser\"\n"
-            + "Services_Database_Password=\"dbpass123\"\n"
-            + "Services_Api_ApiKey=\"apikey456\"\n"
-            + "Services_Cache_ConnectionString=\"redis://localhost:6379\""
+            "Services:Database:Username=\"dbuser\"\n"
+            + "Services:Database:Password=\"dbpass123\"\n"
+            + "Services:Api:ApiKey=\"apikey456\"\n"
+            + "Services:Cache:ConnectionString=\"redis://localhost:6379\""
         );
-        OnePasswordHostingExtension.InvokerFactory = () => mockInvoker;
+        OnePasswordHelper.InvokerFactory = () => mockInvoker;
 
         // Act
         await builder.Use1PasswordAsync();
@@ -155,8 +155,8 @@ public class ComplexNestedSecretsTests : IDisposable
 
         var builder = CreateHostApplicationBuilder(configuration);
 
-        var mockInvoker = new FakeOpCliInvoker("Endpoints_0_ApiKey=\"key123\"\n" + "Endpoints_1_Token=\"token456\"\n" + "Endpoints_1_Secret=\"secret789\"");
-        OnePasswordHostingExtension.InvokerFactory = () => mockInvoker;
+        var mockInvoker = new FakeOpCliInvoker("Endpoints:0:ApiKey=\"key123\"\n" + "Endpoints:1:Token=\"token456\"\n" + "Endpoints:1:Secret=\"secret789\"");
+        OnePasswordHelper.InvokerFactory = () => mockInvoker;
 
         // Act
         await builder.Use1PasswordAsync();
@@ -180,26 +180,26 @@ public class ComplexNestedSecretsTests : IDisposable
         // Arrange
         var configuration = new Dictionary<string, string?>
         {
-            ["AppSettings:Feature_Alpha:AlphaKey"] = "op://vault/alpha/key",
-            ["AppSettings:Feature_Beta:BetaSecret"] = "op://vault/beta/secret",
-            ["AppSettings:Feature_Beta:NestedValue"] = "plain-value",
+            ["AppSettings:Feature:Alpha:AlphaKey"] = "op://vault/alpha/key",
+            ["AppSettings:Feature:Beta:BetaSecret"] = "op://vault/beta/secret",
+            ["AppSettings:Feature:Beta:NestedValue"] = "plain-value",
         };
 
         var builder = CreateHostApplicationBuilder(configuration);
 
 
         var mockInvoker = new FakeOpCliInvoker(
-            "AppSettings_Feature_Alpha_AlphaKey=\"alphakey123\"\n" + "AppSettings_Feature_Beta_BetaSecret=\"betasecret456\""
+            "AppSettings:Feature:Alpha:AlphaKey=\"alphakey123\"\n" + "AppSettings:Feature:Beta:BetaSecret=\"betasecret456\""
         );
-        OnePasswordHostingExtension.InvokerFactory = () => mockInvoker;
+        OnePasswordHelper.InvokerFactory = () => mockInvoker;
 
         // Act
         await builder.Use1PasswordAsync();
 
         // Assert
-        Assert.Equal((string?)"alphakey123", builder.Configuration.GetSection("AppSettings:Feature_Alpha:AlphaKey").Value);
-        Assert.Equal((string?)"betasecret456", builder.Configuration.GetSection("AppSettings:Feature_Beta:BetaSecret").Value);
-        Assert.Equal((string?)"plain-value", builder.Configuration.GetSection("AppSettings:Feature_Beta:NestedValue").Value);
+        Assert.Equal((string?)"alphakey123", builder.Configuration.GetSection("AppSettings:Feature:Alpha:AlphaKey").Value);
+        Assert.Equal((string?)"betasecret456", builder.Configuration.GetSection("AppSettings:Feature:Beta:BetaSecret").Value);
+        Assert.Equal((string?)"plain-value", builder.Configuration.GetSection("AppSettings:Feature:Beta:NestedValue").Value);
     }
 
     /// <summary>
@@ -217,8 +217,8 @@ public class ComplexNestedSecretsTests : IDisposable
 
         var builder = CreateHostApplicationBuilder(configuration);
 
-        var mockInvoker = new FakeOpCliInvoker("A_B_C_D_E_F_G_H_I_J_DeepSecret=\"deep-secret-value\"");
-        OnePasswordHostingExtension.InvokerFactory = () => mockInvoker;
+        var mockInvoker = new FakeOpCliInvoker("A:B:C:D:E:F:G:H:I:J:DeepSecret=\"deep-secret-value\"");
+        OnePasswordHelper.InvokerFactory = () => mockInvoker;
 
         // Act
         await builder.Use1PasswordAsync();
@@ -246,10 +246,10 @@ public class ComplexNestedSecretsTests : IDisposable
 
         var invocationCount = 0;
         var mockInvoker = new FakeOpCliInvokerWithCounter(
-            "Section1_Nested_Secret1=\"value1\"\n" + "Section2_Deep_Nested_Secret2=\"value2\"\n" + "Section3_Secret3=\"value3\"",
+            "Section1:Nested:Secret1=\"value1\"\n" + "Section2:Deep:Nested:Secret2=\"value2\"\n" + "Section3:Secret3=\"value3\"",
             () => invocationCount++
         );
-        OnePasswordHostingExtension.InvokerFactory = () => mockInvoker;
+        OnePasswordHelper.InvokerFactory = () => mockInvoker;
 
         // Act
         await builder.Use1PasswordAsync();
@@ -279,13 +279,13 @@ public class ComplexNestedSecretsTests : IDisposable
 
         var builder = CreateHostApplicationBuilder(configuration);
         var mockInvoker = new FakeOpCliInvoker(
-            "Section1_Nested_DuplicateKey=\"Password1\"\n"
-            + "Section2_Nested_DuplicateKey=\"Password2\"\n"
-            + "Section3_NestedArray_0_DuplicateKey=\"Password3\"\n"
-            + "Section3_NestedArray_1_DuplicateKey=\"Password4\"\n"
-            + "Section3_NestedArray_2_DuplicateKey=\"Password5\""
+            "Section1:Nested:DuplicateKey=\"Password1\"\n"
+            + "Section2:Nested:DuplicateKey=\"Password2\"\n"
+            + "Section3:NestedArray:0:DuplicateKey=\"Password3\"\n"
+            + "Section3:NestedArray:1:DuplicateKey=\"Password4\"\n"
+            + "Section3:NestedArray:2:DuplicateKey=\"Password5\""
         );
-        OnePasswordHostingExtension.InvokerFactory = () => mockInvoker;
+        OnePasswordHelper.InvokerFactory = () => mockInvoker;
 
         // Act
         await builder.Use1PasswordAsync();

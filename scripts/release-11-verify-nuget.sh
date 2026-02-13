@@ -15,3 +15,4 @@ THIS_DIR="$(dirname "$(realpath "$0")")"
 
 # calling shared function from common-verify.sh
 build_nuget "Hosting.Extensions.1Password" "publish-nuget"
+build_nuget "Aspire.Hosting.Extensions.1Password" "publish-nuget"

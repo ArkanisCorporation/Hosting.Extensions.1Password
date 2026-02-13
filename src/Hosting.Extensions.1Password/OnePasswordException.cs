@@ -4,46 +4,32 @@ namespace Arkanis.Hosting.Extensions._1Password
     using JetBrains.Annotations;
 
     /// <summary>
-    /// Exception thrown when 1Password CLI operations fail.
+    /// Exception thrown when an operation with 1Password fails.
     /// </summary>
+    /// <remarks>
+    /// This is a general base exception for all errors related to 1Password operations.
+    /// You can catch this exception to handle any 1Password-related errors in a generic way.
+    /// </remarks>
     [PublicAPI]
     public class OnePasswordException : Exception
     {
         /// <summary>
-        /// Gets the exit code returned by the 1Password CLI.
+        /// Initializes a new instance of the <see cref="OnePasswordException"/> class with the specified message.
         /// </summary>
-        public int ExitCode { get; }
-
-        /// <summary>
-        /// Gets the standard error output from the 1Password CLI.
-        /// </summary>
-        public string StandardError { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OnePasswordException"/> class.
-        /// </summary>
-        /// <param name="message">The error message.</param>
-        /// <param name="exitCode">The exit code from the 1Password CLI.</param>
-        /// <param name="standardError">The standard error output from the CLI.</param>
-        public OnePasswordException(string message, int exitCode, string standardError)
+        /// <param name="message">The message that describes the error.</param>
+        public OnePasswordException(string message)
             : base(message)
         {
-            ExitCode = exitCode;
-            StandardError = standardError;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OnePasswordException"/> class.
+        /// Initializes a new instance of the <see cref="OnePasswordException"/> class with the specified message and inner exception.
         /// </summary>
-        /// <param name="message">The error message.</param>
-        /// <param name="exitCode">The exit code from the 1Password CLI.</param>
-        /// <param name="standardError">The standard error output from the CLI.</param>
-        /// <param name="innerException">The inner exception.</param>
-        public OnePasswordException(string message, int exitCode, string standardError, Exception innerException)
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception.</param>
+        public OnePasswordException(string message, Exception innerException)
             : base(message, innerException)
         {
-            ExitCode = exitCode;
-            StandardError = standardError;
         }
     }
 }
