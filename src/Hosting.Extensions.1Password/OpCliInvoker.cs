@@ -1,6 +1,4 @@
-#pragma warning disable CA1707
 namespace Arkanis.Hosting.Extensions._1Password
-#pragma warning restore CA1707
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;

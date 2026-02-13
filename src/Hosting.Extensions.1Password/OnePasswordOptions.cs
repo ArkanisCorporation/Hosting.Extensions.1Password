@@ -1,17 +1,12 @@
-#pragma warning disable CA1707
 namespace Arkanis.Hosting.Extensions._1Password
-#pragma warning restore CA1707
 {
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Configuration options for 1Password integration.
     /// </summary>
     public class OnePasswordOptions
     {
-        /// <summary>
-        /// Gets the default options instance.
-        /// </summary>
-        public static readonly OnePasswordOptions Default = new OnePasswordOptions();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="OnePasswordOptions"/> class with default values.
         /// </summary>
@@ -23,6 +18,7 @@ namespace Arkanis.Hosting.Extensions._1Password
         /// Initializes a new instance of the <see cref="OnePasswordOptions"/> class by copying values from another instance.
         /// </summary>
         /// <param name="options">The options instance to copy from.</param>
+        [PublicAPI]
         public OnePasswordOptions(OnePasswordOptions options)
         {
             CliInvoker = options.CliInvoker;

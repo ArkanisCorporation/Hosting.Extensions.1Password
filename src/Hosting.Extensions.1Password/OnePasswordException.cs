@@ -1,6 +1,4 @@
-#pragma warning disable CA1707
 namespace Arkanis.Hosting.Extensions._1Password
-#pragma warning restore CA1707
 {
     using System;
     using JetBrains.Annotations;
@@ -8,6 +6,10 @@ namespace Arkanis.Hosting.Extensions._1Password
     /// <summary>
     /// Exception thrown when an operation with 1Password fails.
     /// </summary>
+    /// <remarks>
+    /// This is a general base exception for all errors related to 1Password operations.
+    /// You can catch this exception to handle any 1Password-related errors in a generic way.
+    /// </remarks>
     [PublicAPI]
     public class OnePasswordException : Exception
     {

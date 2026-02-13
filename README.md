@@ -193,6 +193,12 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 // Inject secrets into the AppHost configuration
 await builder.Use1PasswordAsync("my.1password.com");
+// or
+await builder.Use1PasswordAsync(options =>
+{
+    options.Account = "my.1password.com";
+    // Additional options can be configured here
+});
 
 // ...
 builder.Build().Run();
