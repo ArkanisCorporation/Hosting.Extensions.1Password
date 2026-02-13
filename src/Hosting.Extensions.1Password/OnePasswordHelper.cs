@@ -25,17 +25,30 @@ namespace Arkanis.Hosting.Extensions._1Password
                     .Select(parser.CreateResultTemplate)
             );
 
-            var invoker = GetCliInvoker(options);
-            var result = await invoker.InvokeAsync(options.Account, opTemplate);
-            ValidateInvokerResult(result, options);
-
-            foreach (var pair in ProcessResults(result, parser))
+            try
             {
-                // Only update if the key exists in our sections dictionary
-                if (opSections.TryGetValue(pair.Key, out var section))
+                var invoker = GetCliInvoker(options);
+                var result = await invoker.InvokeAsync(options.Account, opTemplate);
+                ValidateInvokerResult(result, options);
+
+                foreach (var pair in ProcessResults(result, parser))
                 {
-                    section.Value = pair.Value;
+                    // Only update if the key exists in our sections dictionary
+                    if (opSections.TryGetValue(pair.Key, out var section))
+                    {
+                        section.Value = pair.Value;
+                    }
                 }
+            }
+            catch (OnePasswordException)
+            {
+                // pass through known exceptions related to 1Password operations without wrapping
+                throw;
+            }
+            catch (Exception e)
+            {
+                // wrap any other exceptions that occur during invocation or processing in a OnePasswordException
+                throw new OnePasswordException("Failed to invoke and process results", e);
             }
         }
 
@@ -46,13 +59,26 @@ namespace Arkanis.Hosting.Extensions._1Password
             var parser = GetResponseParser(options);
             var template = parser.CreateResultTemplate(KeyValuePair.Create(resultKey, key));
 
-            var invoker = GetCliInvoker(options);
-            var result = await invoker.InvokeAsync(options.Account, template);
-            ValidateInvokerResult(result, options);
+            try
+            {
+                var invoker = GetCliInvoker(options);
+                var result = await invoker.InvokeAsync(options.Account, template);
+                ValidateInvokerResult(result, options);
 
-            return ProcessResults(result, parser)
-                .Single(x => x.Key == resultKey)
-                .Value;
+                return ProcessResults(result, parser)
+                    .Single(x => x.Key == resultKey)
+                    .Value;
+            }
+            catch (OnePasswordException)
+            {
+                // pass through known exceptions related to 1Password operations without wrapping
+                throw;
+            }
+            catch (Exception e)
+            {
+                // wrap any other exceptions that occur during invocation or processing in a OnePasswordException
+                throw new OnePasswordException("Failed to invoke and process results", e);
+            }
         }
 
         private static IEnumerable<KeyValuePair<string, string>> ProcessResults(BufferedCommandResult result, IOnePasswordResponseParser parser)
