@@ -15,3 +15,4 @@ THIS_DIR="$(dirname "$(realpath "$0")")"
 
 # calling shared function from common-publish.sh
 publish_nuget "Hosting.Extensions.1Password" "publish-nuget"
+publish_nuget "Aspire.Hosting.Extensions.1Password" "publish-nuget"

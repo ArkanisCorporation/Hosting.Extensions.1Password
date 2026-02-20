@@ -19,6 +19,7 @@ namespace Arkanis.Hosting.Extensions._1Password
             var result = await Cli.Wrap("op")
                 .WithStandardInputPipe(PipeSource.FromString(opTemplate))
                 .WithArguments(arguments, true)
+                .WithValidation(CommandResultValidation.None)
                 .ExecuteBufferedAsync();
 
             return result;
