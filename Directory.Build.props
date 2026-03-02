@@ -10,6 +10,10 @@
         <WarningsNotAsErrors>
             $(WarningsNotAsErrors);
         </WarningsNotAsErrors>
+
+        <!-- Not supported in netstandard2.1 -->
+        <!-- And causes issues for multi-targeted packages -->
+        <ImplicitUsings>disable</ImplicitUsings>
     </PropertyGroup>
 
     <PropertyGroup>

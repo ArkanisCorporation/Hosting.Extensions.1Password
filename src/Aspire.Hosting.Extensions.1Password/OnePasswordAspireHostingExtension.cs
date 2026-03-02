@@ -1,5 +1,6 @@
 ﻿namespace Arkanis.Aspire.Hosting.Extensions._1Password;
 
+using System;
 using System.Threading.Tasks;
 using Arkanis.Hosting.Extensions._1Password;
 using global::Aspire.Hosting;

@@ -1,4 +1,5 @@
 using Arkanis.Aspire.Hosting.Extensions._1Password;
+using Aspire.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
