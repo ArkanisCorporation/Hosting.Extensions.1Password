@@ -14,5 +14,5 @@ THIS_DIR="$(dirname "$(realpath "$0")")"
 #| `stderr`         | Can be used for logging.                                                 |
 
 # calling shared function from common-verify.sh
-build_nuget "Hosting.Extensions.1Password" "publish-nuget"
-build_nuget "Aspire.Hosting.Extensions.1Password" "publish-nuget"
+build_nuget "Hosting.Extensions.1Password" "publish-common-nuget"
+build_nuget "Aspire.Hosting.Extensions.1Password" "publish-aspire-nuget"
