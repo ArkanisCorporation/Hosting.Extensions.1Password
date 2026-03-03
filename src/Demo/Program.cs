@@ -1,3 +1,4 @@
+using System;
 using Arkanis.Hosting.Extensions._1Password;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
