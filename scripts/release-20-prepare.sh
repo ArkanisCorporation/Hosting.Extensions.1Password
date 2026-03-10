@@ -17,7 +17,8 @@ THIS_DIR="$(dirname "$(realpath "$0")")"
 [[ -z "${NUGET_PUBLISH_API_KEY+x}" ]] && >&2 echo "NUGET_PUBLISH_API_KEY is not set" && exit 2
 
 DIRS=(
-publish-nuget
+publish-common-nuget
+publish-aspire-nuget
 )
 RETURN=0
 

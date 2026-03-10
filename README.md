@@ -3,6 +3,7 @@
 **Seamlessly integrate 1Password secrets into your .NET applications during development.**
 
 [![NuGet](https://img.shields.io/nuget/v/Arkanis.Hosting.Extensions.1Password.svg)](https://www.nuget.org/packages/Arkanis.Hosting.Extensions.1Password/)
+[![Aspire NuGet](https://img.shields.io/nuget/v/Arkanis.Aspire.Hosting.Extensions.1Password.svg)](https://www.nuget.org/packages/Arkanis.Aspire.Hosting.Extensions.1Password/)
 [![License](https://img.shields.io/github/license/ArkanisCorporation/Hosting.Extensions.1Password)](LICENSE.md)
 
 ---
@@ -24,8 +25,12 @@ If you love 1Password (and who doesn't?) and want to bring that same level of se
 - **🌐 Multi-Account Support** - Specify which 1Password account to use
 - **🎨 Developer-Friendly** - Simple API with just one method call to set up
 - **📦 Lightweight** - Built on .NET Standard 2.1 for broad compatibility
+- **🐳 Aspire Integration** - First-class support for .NET Aspire distributed applications
+- **🔗 Parameter Resources** - Add individual 1Password secrets as Aspire parameter resources
 
 ## 📦 Installation
+
+### Core Library
 
 Install via NuGet Package Manager:
 
@@ -37,6 +42,20 @@ Or via Package Manager Console:
 
 ```powershell
 Install-Package Arkanis.Hosting.Extensions.1Password
+```
+
+### Aspire Integration (Optional)
+
+For use with .NET Aspire projects:
+
+```bash
+dotnet add package Arkanis.Aspire.Hosting.Extensions.1Password
+```
+
+Or via Package Manager Console:
+
+```powershell
+Install-Package Arkanis.Aspire.Hosting.Extensions.1Password
 ```
 
 ## 🎯 Quick Start
@@ -160,6 +179,52 @@ var host = builder.Build();
 await host.RunAsync();
 ```
 
+### .NET Aspire Integration
+
+Use 1Password with .NET Aspire for distributed application configuration:
+
+#### Using Aspire with Automatic Secret Resolution
+
+```csharp
+using Aspire.Hosting;
+using Arkanis.Aspire.Hosting.Extensions._1Password;
+
+var builder = DistributedApplication.CreateBuilder(args);
+
+// Inject secrets into the AppHost configuration
+await builder.Use1PasswordAsync("my.1password.com");
+// or
+await builder.Use1PasswordAsync(options =>
+{
+    options.Account = "my.1password.com";
+    // Additional options can be configured here
+});
+
+// ...
+builder.Build().Run();
+```
+
+#### Using Aspire Parameter Resources
+
+Add individual 1Password parameters as Aspire resources:
+
+```csharp
+using Aspire.Hosting;
+using Arkanis.Aspire.Hosting.Extensions._1Password;
+
+var builder = DistributedApplication.CreateBuilder(args);
+
+// Add a specific 1Password secret as a parameter resource
+builder.Add1PasswordParameter(
+    key: "ApiKey",
+    onePasswordKey: "op://Private/MyApp/ApiKey",
+    account: "my.1password.com"
+);
+
+// ...
+builder.Build().Run();
+```
+
 ### Complex Configuration Structures
 
 The library automatically traverses nested configuration:
@@ -214,8 +279,13 @@ Assert.Equal("test-api-key-123", builder.Configuration["ApiKey"]);
 
 ## 📋 Requirements
 
-### Runtime Requirements
+### Core Library
 - **.NET Runtime**: .NET Standard 2.1 or higher (supports .NET Core 3.0+, .NET 5+, .NET 6+, etc.)
+- **1Password CLI**: The `op` CLI must be installed and available in your PATH
+- **Authentication**: You must be signed in to 1Password (the CLI will use your existing session)
+
+### Aspire Package
+- **.NET Runtime**: .NET 8.0, 9.0, or 10.0
 - **1Password CLI**: The `op` CLI must be installed and available in your PATH
 - **Authentication**: You must be signed in to 1Password (the CLI will use your existing session)
 
@@ -234,12 +304,22 @@ winget install 1password-cli
 
 ## 🔧 How It Works
 
+### Core Library (`Arkanis.Hosting.Extensions.1Password`)
+
 1. **Detection**: The library scans your `IConfiguration` for any values starting with `op://`
 2. **Templating**: It builds a template with all detected secret references
 3. **Resolution**: It invokes the 1Password CLI (`op inject`) to resolve all secrets in one call
 4. **Injection**: The resolved values are written back into your configuration in-memory
 
 All of this happens transparently during application startup, before your services are registered or initialized.
+
+### Aspire Integration (`Arkanis.Aspire.Hosting.Extensions.1Password`)
+
+The Aspire package extends the core library with features tailored for distributed applications:
+
+- **AppHost Integration**: Resolve 1Password secrets in your `AppHost` project configuration
+- **Parameter Resources**: Add individual 1Password secrets as Aspire parameter resources that can be referenced by services
+- **Dual APIs**: Both async (`Use1PasswordAsync`) and sync (`Use1Password`) methods for compatibility with `IHostApplicationBuilder`
 
 ## 🎯 Use Cases
 
