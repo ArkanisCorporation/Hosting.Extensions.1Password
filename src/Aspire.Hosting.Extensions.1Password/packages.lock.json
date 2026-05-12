@@ -4,9 +4,9 @@
     "net10.0": {
       "Aspire.Hosting": {
         "type": "Direct",
-        "requested": "[13.3.0, )",
-        "resolved": "13.3.0",
-        "contentHash": "tql09+PaszOX61RCiwBWK4FQOO23u9kzvGkj7ML+IEirBQXnNW94HuBoi7wcxibdwRi7RHguzC1SkGZNt2eP5A==",
+        "requested": "[13.3.1, )",
+        "resolved": "13.3.1",
+        "contentHash": "Ov30VD+ym9Rv7ZW867nEx2uKj0L6/CSFbW5g65bcn/uD+O6KqFwvTSg+SrjpEc6+243WIWvSjgoHbkfS5ukoJg==",
         "dependencies": {
           "AspNetCore.HealthChecks.Uris": "9.0.0",
           "Google.Protobuf": "3.33.5",
@@ -610,9 +610,9 @@
     "net8.0": {
       "Aspire.Hosting": {
         "type": "Direct",
-        "requested": "[13.3.0, )",
-        "resolved": "13.3.0",
-        "contentHash": "tql09+PaszOX61RCiwBWK4FQOO23u9kzvGkj7ML+IEirBQXnNW94HuBoi7wcxibdwRi7RHguzC1SkGZNt2eP5A==",
+        "requested": "[13.3.1, )",
+        "resolved": "13.3.1",
+        "contentHash": "Ov30VD+ym9Rv7ZW867nEx2uKj0L6/CSFbW5g65bcn/uD+O6KqFwvTSg+SrjpEc6+243WIWvSjgoHbkfS5ukoJg==",
         "dependencies": {
           "AspNetCore.HealthChecks.Uris": "9.0.0",
           "Google.Protobuf": "3.33.5",
@@ -1258,9 +1258,9 @@
     "net9.0": {
       "Aspire.Hosting": {
         "type": "Direct",
-        "requested": "[13.3.0, )",
-        "resolved": "13.3.0",
-        "contentHash": "tql09+PaszOX61RCiwBWK4FQOO23u9kzvGkj7ML+IEirBQXnNW94HuBoi7wcxibdwRi7RHguzC1SkGZNt2eP5A==",
+        "requested": "[13.3.1, )",
+        "resolved": "13.3.1",
+        "contentHash": "Ov30VD+ym9Rv7ZW867nEx2uKj0L6/CSFbW5g65bcn/uD+O6KqFwvTSg+SrjpEc6+243WIWvSjgoHbkfS5ukoJg==",
         "dependencies": {
           "AspNetCore.HealthChecks.Uris": "9.0.0",
           "Google.Protobuf": "3.33.5",
