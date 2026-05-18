@@ -5,6 +5,15 @@ on:
     branches: [ main, release/*, ci ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: "Runner pool (override to ubuntu-latest if self-hosted is broken)"
+        type: choice
+        options:
+          - arkanis-runners
+          - ubuntu-latest
+        default: arkanis-runners
 
 permissions:
   id-token: write       # enable GitHub OIDC token issuance for this job
@@ -20,12 +29,15 @@ jobs:
   test:
     name: Tests
     uses: ./.github/workflows/_test.yaml
+    secrets: inherit
+    with:
+      runner: ${{ inputs.runner || 'arkanis-runners' }}
 
   release:
     name: Release
     needs: test
     uses: ./.github/workflows/_release.yaml
-    secrets:
-      NUGET_USER: ${{ secrets.NUGET_USER }}
+    secrets: inherit
     with:
       dry_run: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/ci' }}
+      runner: ${{ inputs.runner || 'arkanis-runners' }}
