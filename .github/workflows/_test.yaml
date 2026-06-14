@@ -14,7 +14,7 @@ on:
         description: "Runner pool"
         required: false
         type: string
-        default: arkanis-runners
+        default: daedalus
 
 env:
   # https://github.com/actions/setup-dotnet?tab=readme-ov-file#reduce-caching-size
