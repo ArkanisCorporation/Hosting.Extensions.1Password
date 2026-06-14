@@ -11,9 +11,10 @@ on:
         description: "Runner pool (override to ubuntu-latest if self-hosted is broken)"
         type: choice
         options:
+          - daedalus
           - arkanis-runners
           - ubuntu-latest
-        default: arkanis-runners
+        default: daedalus
 
 permissions:
   id-token: write       # enable GitHub OIDC token issuance for this job
@@ -31,7 +32,7 @@ jobs:
     uses: ./.github/workflows/_test.yaml
     secrets: inherit
     with:
-      runner: ${{ inputs.runner || 'arkanis-runners' }}
+      runner: ${{ inputs.runner || vars.RUNNER_DEFAULT || 'daedalus' }}
 
   release:
     name: Release
@@ -40,4 +41,4 @@ jobs:
     secrets: inherit
     with:
       dry_run: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/ci' }}
-      runner: ${{ inputs.runner || 'arkanis-runners' }}
+      runner: ${{ inputs.runner || vars.RUNNER_DEFAULT || 'daedalus' }}
