@@ -4,11 +4,11 @@
     ".NETStandard,Version=v2.1": {
       "CliWrap": {
         "type": "Direct",
-        "requested": "[3.10.1, )",
-        "resolved": "3.10.1",
-        "contentHash": "C+WzXwzpQsJVNqvuh19ZO/bw/vR43L+DC/CmvK+PATUBkail2AWYE6an17dOGgWaVGzF9sU28YwRwfNfkPrQdg==",
+        "requested": "[3.10.2, )",
+        "resolved": "3.10.2",
+        "contentHash": "oW63Lh5Tr2dVRnGSn5UyV2ITAYTdyaGB8r4pGMcz7CwfzketV7ANyn2LvNJtOjXjL/tJbG0qDH8Xwgt3jgGMNg==",
         "dependencies": {
-          "System.Management": "10.0.3"
+          "System.Management": "10.0.8"
         }
       },
       "JetBrains.Annotations": {
@@ -271,8 +271,8 @@
       },
       "System.CodeDom": {
         "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "+G1mBhHJp8taiDcHK1gmckOZ884n9JeIrS1dzFYZhSa8oTiIF+EagIyAyCOQzdBbbES7eb9AkjGBlUZqqoCaeg=="
+        "resolved": "10.0.8",
+        "contentHash": "23AxxQYf5rjSmsawFw8kCVLRvvCIKMCnZWnRzBcHkzwsBra5eTv4k88BV6fEN+f3FVHO7PneZj3LOEyQnnPhTA=="
       },
       "System.ComponentModel.Annotations": {
         "type": "Transitive",
@@ -308,10 +308,10 @@
       },
       "System.Management": {
         "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "VyK/nnG1ZgwP/wY8HGrNrdha7kenyI+bkfE0miywiRaWVwqtenuYshA6pmP6Xm7lPsTE2ZRZ+BkzmUVg/VZtTg==",
+        "resolved": "10.0.8",
+        "contentHash": "8GgwcQgAv1Xg0z4vkJ759AJOFbZpK17cX9+21SOHo+KXS+VUhwSBeFSzjDJyyaEiJwgQ0D5sGnfpEs2hjyZrmA==",
         "dependencies": {
-          "System.CodeDom": "10.0.3"
+          "System.CodeDom": "10.0.8"
         }
       },
       "System.Memory": {
