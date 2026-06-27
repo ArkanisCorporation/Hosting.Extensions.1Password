@@ -9,6 +9,12 @@
         </NoWarn>
         <WarningsNotAsErrors>
             $(WarningsNotAsErrors);
+            NU1900; <!-- Error occurred while getting package vulnerability data: Unable to load the service index for source... -->
+            NU1901; <!-- Package 'X' has a known Y severity vulnerability -->
+            NU1902; <!-- Package 'X' has a known Y severity vulnerability -->
+            NU1903; <!-- Package 'X' has a known Y severity vulnerability -->
+            NU1904; <!-- Package 'X' has a known Y severity vulnerability -->
+            CA1873; <!-- Evaluation of this argument may be expensive and unnecessary if logging is disabled -->
         </WarningsNotAsErrors>
 
         <!-- Not supported in netstandard2.1 -->

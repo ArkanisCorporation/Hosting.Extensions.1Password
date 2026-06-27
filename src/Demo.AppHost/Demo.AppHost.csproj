@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.1.1">
+<Project Sdk="Aspire.AppHost.Sdk/13.4.6">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -18,6 +18,13 @@
       <ProjectReference Include="..\Aspire.Hosting.Extensions.1Password\Aspire.Hosting.Extensions.1Password.csproj">
           <IsAspireProjectResource>false</IsAspireProjectResource>
       </ProjectReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="DotNet.ReproducibleBuilds">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
 
 </Project>

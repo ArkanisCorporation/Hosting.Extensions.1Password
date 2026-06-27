@@ -9,6 +9,12 @@ concurrency:
 
 on:
   workflow_call:
+    inputs:
+      runner:
+        description: "Runner pool"
+        required: false
+        type: string
+        default: daedalus
 
 env:
   # https://github.com/actions/setup-dotnet?tab=readme-ov-file#reduce-caching-size
@@ -16,10 +22,10 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     steps:
       -   name: Git checkout
-          uses: actions/checkout@v6
+          uses: actions/checkout@v7
 
       -   name: Setup .NET
           id: setup-dotnet

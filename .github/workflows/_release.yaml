@@ -12,6 +12,15 @@ permissions:
 
 on:
   workflow_dispatch:
+    inputs:
+      runner:
+        description: "Runner pool (override to ubuntu-latest if self-hosted is broken)"
+        type: choice
+        options:
+          - daedalus
+          - arkanis-runners
+          - ubuntu-latest
+        default: daedalus
   workflow_call:
     inputs:
       dry_run:
@@ -19,6 +28,11 @@ on:
         required: false
         type: boolean
         default: false
+      runner:
+        description: "Runner pool"
+        required: false
+        type: string
+        default: daedalus
     secrets:
       NUGET_USER:
         required: true
@@ -44,10 +58,10 @@ env:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-tags: true
 
@@ -69,6 +83,14 @@ jobs:
 
       - run: echo "Cache hit - ${{ steps.setup-dotnet.outputs.cache-hit }}"
 
+      # ? Needed for semantic-release to run on self-hosted runners.
+      # ? Safe to run on GitHub-hosted runners, so we run it on all runners.
+      # ? This let's us avoid having to check the runner type and conditionally run this step. (brittle)
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+
       - name: Restore dependencies
         run: dotnet tool restore
 
@@ -78,7 +100,7 @@ jobs:
       # determines whether a new version release is mandated
       # if it is, publish scripts are run and new version is tagged and published
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v6.0.0
         id: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -93,6 +115,15 @@ jobs:
             @semantic-release/exec@7.0.3
 
       - run: echo "New release - ${{ steps.semantic-release.outputs.new_release_version || 'no new release' }}"
+
+      - name: Install GitHub CLI
+        if: ${{ ! inputs.dry_run && steps.semantic-release.outputs.new_release_version && github.ref == 'refs/heads/release/stable' }}
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+          sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gh
 
       - name: Setup Version Backpropagation PR
         if: ${{ ! inputs.dry_run && steps.semantic-release.outputs.new_release_version && github.ref == 'refs/heads/release/stable' }}
