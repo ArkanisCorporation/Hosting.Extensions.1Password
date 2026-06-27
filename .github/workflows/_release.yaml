@@ -83,6 +83,14 @@ jobs:
 
       - run: echo "Cache hit - ${{ steps.setup-dotnet.outputs.cache-hit }}"
 
+      # ? Needed for semantic-release to run on self-hosted runners.
+      # ? Safe to run on GitHub-hosted runners, so we run it on all runners.
+      # ? This let's us avoid having to check the runner type and conditionally run this step. (brittle)
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+
       - name: Restore dependencies
         run: dotnet tool restore
 
