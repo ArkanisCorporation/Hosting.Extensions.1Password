@@ -87,7 +87,7 @@ jobs:
       # ? Safe to run on GitHub-hosted runners, so we run it on all runners.
       # ? This let's us avoid having to check the runner type and conditionally run this step. (brittle)
       - name: Install Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
 
