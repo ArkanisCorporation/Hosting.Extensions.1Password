@@ -200,3 +200,25 @@ public class OnePasswordHelperTests : IDisposable
         Assert.Equal((string?)"op://e", builder.Configuration.GetSection("SecretE").Value);
     }
 }
+
+/// <summary>
+/// Unit tests for <see cref="OnePasswordOptions" />.
+/// </summary>
+public class OnePasswordOptionsTests
+{
+    /// <summary>
+    /// Tests that the default configuration schema uses the public canonical reference prefix.
+    /// </summary>
+    [Fact]
+    public void ConfigurationSectionItemSchema_DefaultValue_UsesCanonicalReferencePrefix()
+    {
+        // Arrange
+        var options = new OnePasswordOptions();
+
+        // Act
+        var schema = options.ConfigurationSectionItemSchema;
+
+        // Assert
+        Assert.Equal(OnePasswordSecretReference.Prefix, schema);
+    }
+}

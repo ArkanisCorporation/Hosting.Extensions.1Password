@@ -1,4 +1,5 @@
 using Arkanis.Aspire.Hosting.Extensions._1Password;
+using Arkanis.Hosting.Extensions._1Password;
 using Aspire.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -8,6 +9,13 @@ await builder.Use1PasswordAsync("my.1password.com");
 builder.AddParameter("ConnectionString", secret: true);
 // or
 builder.Add1PasswordParameter("ConnectionString2", "op://Private/DummyCredential/password", "my.1password.com");
+
+// New integrations should construct canonical references from the public contract.
+builder.Add1PasswordParameter(
+    "ConnectionString2-canonical",
+    OnePasswordSecretReference.Prefix + "Private/DummyCredential/password",
+    "my.1password.com"
+);
 
 await builder.Use1PasswordAsync(options =>
 {
@@ -21,5 +29,16 @@ builder.Add1PasswordParameter("ConnectionString2-company", "op-company://Private
     options.ConfigurationSectionItemSchema = "op-company://";
     options.Account = "my.1password.com"; // replace with company-specific account if needed
 });
+
+const string companySchema = "op-company://";
+builder.Add1PasswordParameter(
+    "ConnectionString2-company-configured",
+    companySchema + "Private/DummyCredential/password",
+    configureOptions: options =>
+    {
+        options.ConfigurationSectionItemSchema = companySchema;
+        options.Account = "my.1password.com"; // replace with company-specific account if needed
+    }
+);
 
 builder.Build().Run();
