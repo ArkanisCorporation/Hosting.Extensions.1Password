@@ -19,7 +19,7 @@ public static class OnePasswordAspireHostingExtension
         /// Adds a parameter to the distributed application whose value is retrieved from 1Password using the specified 1Password key.
         /// </summary>
         /// <param name="key">The key of the parameter to add.</param>
-        /// <param name="onePasswordKey">The 1Password key (e.g. "op://path/to/secret/field") to retrieve the value from.</param>
+        /// <param name="onePasswordKey">The 1Password secret reference to retrieve the value from.</param>
         /// <param name="account">The 1Password account or sign-in address to pass to the `op` CLI.</param>
         /// <param name="failSilently">
         /// If true, CLI failures and malformed output will be silently ignored and the parameter value will be null.
@@ -51,7 +51,7 @@ public static class OnePasswordAspireHostingExtension
         /// Adds a parameter to the distributed application whose value is retrieved from 1Password using the specified 1Password key.
         /// </summary>
         /// <param name="key">The key of the parameter to add.</param>
-        /// <param name="onePasswordKey">The 1Password key (e.g. "op://path/to/secret/field") to retrieve the value from.</param>
+        /// <param name="onePasswordKey">The 1Password secret reference to retrieve the value from.</param>
         /// <param name="configureOptions">An action to configure 1Password options such as account and error handling behavior.</param>
         /// <param name="secret">Optional flag indicating whether the parameter should be regarded as secret.</param>
         /// <param name="publishValueAsDefault">Indicates whether the value should be published to the manifest. This is not meant for sensitive data.</param>
@@ -67,7 +67,12 @@ public static class OnePasswordAspireHostingExtension
             var options = new OnePasswordOptions();
             configureOptions?.Invoke(options);
 
-            return builder.AddParameter(key, ValueGetter, publishValueAsDefault, secret);
+            var parameter = builder.AddParameter(key, ValueGetter, publishValueAsDefault, secret);
+            parameter.Resource.Annotations.Add(
+                new OnePasswordParameterReferenceAnnotation(onePasswordKey, options.ConfigurationSectionItemSchema)
+            );
+
+            return parameter;
 
             string ValueGetter()
                 => OnePasswordHelper.Resolve1PasswordItem(onePasswordKey, options).GetAwaiter().GetResult();
@@ -76,11 +81,11 @@ public static class OnePasswordAspireHostingExtension
         /// <summary>
         /// Uses 1Password to inject secrets into the application's configuration.
         /// Automatically detects configuration entries that reference 1Password secrets
-        /// using the "op://" URI scheme and replaces them with the actual secret values.
+        /// using the configured 1Password reference schema and replaces them with the actual secret values.
         /// </summary>
         /// <param name="account">The 1Password account or sign-in address to pass to the `op` CLI.</param>
         /// <param name="failSilently">
-        /// If true, CLI failures and malformed output will be silently ignored and op:// references remain unchanged.
+        /// If true, CLI failures and malformed output will be silently ignored and configured references remain unchanged.
         /// If false (default), throws <see cref="OnePasswordCliException"/> on CLI errors or malformed output.
         /// </param>
         /// <returns>The distributed application builder for chaining.</returns>
@@ -98,7 +103,7 @@ public static class OnePasswordAspireHostingExtension
         /// <summary>
         /// Uses 1Password to inject secrets into the application's configuration.
         /// Automatically detects configuration entries that reference 1Password secrets
-        /// using the "op://" URI scheme and replaces them with the actual secret values.
+        /// using the configured 1Password reference schema and replaces them with the actual secret values.
         /// </summary>
         /// <param name="configureOptions">An action to configure 1Password options such as account and error handling behavior.</param>
         /// <returns>The distributed application builder for chaining.</returns>

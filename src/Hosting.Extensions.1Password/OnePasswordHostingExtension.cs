@@ -13,12 +13,12 @@ public static class OnePasswordHostingExtension
     /// <summary>
     /// Uses 1Password to inject secrets into the application's configuration.
     /// Automatically detects configuration entries that reference 1Password secrets
-    /// using the "op://" URI scheme and replaces them with the actual secret values.
+    /// using the configured 1Password reference schema and replaces them with the actual secret values.
     /// </summary>
     /// <param name="builder">The host application builder.</param>
     /// <param name="account">The 1Password account or sign-in address to pass to the `op` CLI.</param>
     /// <param name="failSilently">
-    /// If true, CLI failures and malformed output will be silently ignored and op:// references remain unchanged.
+    /// If true, CLI failures and malformed output will be silently ignored and configured references remain unchanged.
     /// If false (default), throws <see cref="OnePasswordCliException"/> on CLI errors or malformed output.
     /// </param>
     /// <returns>The host application builder for chaining.</returns>
@@ -36,7 +36,7 @@ public static class OnePasswordHostingExtension
     /// <summary>
     /// Uses 1Password to inject secrets into the application's configuration.
     /// Automatically detects configuration entries that reference 1Password secrets
-    /// using the "op://" URI scheme and replaces them with the actual secret values.
+    /// using the configured 1Password reference schema and replaces them with the actual secret values.
     /// </summary>
     /// <param name="builder">The host application builder.</param>
     /// <param name="configureOptions">An action to configure 1Password options such as account and error handling behavior.</param>

@@ -39,9 +39,10 @@ public class OnePasswordOptions
     public IOnePasswordResponseParser? ResponseParser { get; set; }
 
     /// <summary>
-    /// Gets or sets the schema prefix used to identify 1Password secret references in configuration (default: "op://").
+    /// Gets or sets the schema prefix used to identify 1Password secret references in configuration.
+    /// The default is <see cref="OnePasswordSecretReference.Prefix" />.
     /// </summary>
-    public string ConfigurationSectionItemSchema { get; set; } = "op://";
+    public string ConfigurationSectionItemSchema { get; set; } = OnePasswordSecretReference.Prefix;
 
     /// <summary>
     /// Gets or sets the 1Password account or sign-in address to use.
