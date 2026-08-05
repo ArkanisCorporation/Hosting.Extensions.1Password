@@ -225,6 +225,46 @@ builder.Add1PasswordParameter(
 builder.Build().Run();
 ```
 
+#### Using Canonical References in Publishing Integrations
+
+Keep existing literal configuration and AppHost examples when they are the clearest way to show a concrete secret location.
+When an integration needs to recognize the standard 1Password reference scheme, build that reference from the public contract instead of declaring the protocol prefix itself:
+
+```csharp
+using Aspire.Hosting;
+using Arkanis.Aspire.Hosting.Extensions._1Password;
+using Arkanis.Hosting.Extensions._1Password;
+
+var builder = DistributedApplication.CreateBuilder(args);
+
+builder.Add1PasswordParameter(
+    key: "CanonicalApiKey",
+    onePasswordKey: OnePasswordSecretReference.Prefix + "Private/MyApp/ApiKey",
+    account: "my.1password.com"
+);
+
+builder.Build().Run();
+```
+
+`Add1PasswordParameter(...)` attaches a `OnePasswordParameterReferenceAnnotation` to the resulting Aspire parameter resource.
+Publishing integrations can use its `Reference` and `ConfigurationSectionItemSchema` properties to inspect the configured source without resolving a secret value while the AppHost model is being built.
+
+For a custom reference scheme, configure the same schema used to construct the parameter reference:
+
+```csharp
+const string companySchema = "op-company://";
+
+builder.Add1PasswordParameter(
+    key: "CompanyApiKey",
+    onePasswordKey: companySchema + "Private/MyApp/ApiKey",
+    configureOptions: options =>
+    {
+        options.ConfigurationSectionItemSchema = companySchema;
+        options.Account = "my.1password.com";
+    }
+);
+```
+
 ### Complex Configuration Structures
 
 The library automatically traverses nested configuration:
