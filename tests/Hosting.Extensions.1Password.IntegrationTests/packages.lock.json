@@ -305,16 +305,16 @@
       "Arkanis.Hosting.Extensions.1Password": {
         "type": "Project",
         "dependencies": {
-          "CliWrap": "[3.10.4, )",
+          "CliWrap": "[3.10.5, )",
           "JetBrains.Annotations": "[2026.2.0, )",
           "Microsoft.Extensions.Hosting": "[10.0.11, )"
         }
       },
       "CliWrap": {
         "type": "CentralTransitive",
-        "requested": "[3.10.4, )",
-        "resolved": "3.10.4",
-        "contentHash": "Vv0HjTkbCOsicbY4uX978MJOoWabFV/GE0zS2ww2mKNLcqLVPY8xaFRIRWa8dRhjkAYhe9h9uhRnw5FCT8Qa4A=="
+        "requested": "[3.10.5, )",
+        "resolved": "3.10.5",
+        "contentHash": "L5SghZThsAVhV8ucwwW5FLMzKj1Ps57JB8DM2bEjpBNTyGi1EDjDO7Mi39Yx1FoXM2fZ1l9j39xqlPsZI1QCJQ=="
       },
       "JetBrains.Annotations": {
         "type": "CentralTransitive",
