@@ -704,7 +704,7 @@
         "type": "Project",
         "dependencies": {
           "Arkanis.Hosting.Extensions.1Password": "[1.0.0, )",
-          "Aspire.Hosting": "[13.5.2, )"
+          "Aspire.Hosting": "[13.5.3, )"
         }
       },
       "Arkanis.Hosting.Extensions.1Password": {
@@ -717,9 +717,9 @@
       },
       "Aspire.Hosting": {
         "type": "CentralTransitive",
-        "requested": "[13.5.2, )",
-        "resolved": "13.5.2",
-        "contentHash": "/Feq5MVWvVyMZDL6jBYyvMdGY51V9OOIuhGGHCaeuFf25uay7xr3KMoNud63SHLx6hegZgs5QwOsWN9t8FmStg==",
+        "requested": "[13.5.3, )",
+        "resolved": "13.5.3",
+        "contentHash": "VPsd2pgTgmwGLPTUrTD1oYR1XKMgh2ceSPBCF71NHxXSeXhSdpNHmCFDcv7tv8WgoEZDEQ76uIC6oklsEV9D/Q==",
         "dependencies": {
           "AspNetCore.HealthChecks.Uris": "9.0.0",
           "Google.Protobuf": "3.34.1",
