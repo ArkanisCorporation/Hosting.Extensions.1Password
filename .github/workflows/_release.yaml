@@ -52,8 +52,6 @@ on:
         value: ${{ jobs.release.outputs.last_tag }}
 
 env:
-  # https://github.com/actions/setup-dotnet?tab=readme-ov-file#reduce-caching-size
-  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   REGISTRY: ghcr.io
 
 jobs:
@@ -72,6 +70,10 @@ jobs:
         with:
           user: ${{ secrets.NUGET_USER }}
 
+      # Caches NuGet's default global-packages folder. Do not point NUGET_PACKAGES at the
+      # workspace to shrink it: the cache `version` is a hash of the literal path, and every
+      # daedalus replica has its own workspace, so that split the cache into one namespace per
+      # replica, each ageing on its own until a stale one broke restores outright (ARK-502).
       - name: Setup .NET
         id: setup-dotnet
         uses: actions/setup-dotnet@v6
