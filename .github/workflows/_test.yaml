@@ -16,10 +16,6 @@ on:
         type: string
         default: daedalus
 
-env:
-  # https://github.com/actions/setup-dotnet?tab=readme-ov-file#reduce-caching-size
-  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
-
 jobs:
   test:
     runs-on: ${{ inputs.runner }}
@@ -27,6 +23,10 @@ jobs:
       -   name: Git checkout
           uses: actions/checkout@v7
 
+      # Caches NuGet's default global-packages folder. Do not point NUGET_PACKAGES at the
+      # workspace to shrink it: the cache `version` is a hash of the literal path, and every
+      # daedalus replica has its own workspace, so that split the cache into one namespace per
+      # replica, each ageing on its own until a stale one broke restores outright (ARK-502).
       -   name: Setup .NET
           id: setup-dotnet
           uses: actions/setup-dotnet@v6
