@@ -52,9 +52,10 @@ The test secrets are configured in `appsettings.json`. To use different secrets:
 
 Integration tests are **automatically excluded** from CI pipelines to avoid requiring 1Password setup on build agents.
 
-See `.github/workflows/_test.yaml` for the test filter configuration:
+See `.github/workflows/_test.yaml` for the test filter configuration, passed to the shared
+`ci` platform's reusable test workflow:
 ```yaml
-run: dotnet test --filter "Category!=Integration"
+test-filter: "Category!=Integration"
 ```
 
 ## Troubleshooting

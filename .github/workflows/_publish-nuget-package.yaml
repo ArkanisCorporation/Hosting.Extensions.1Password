@@ -1,0 +1,111 @@
+# Reusable NuGet package publish lane.
+#
+# Packs and pushes this repo's two packages at the released version, using the shared ci
+# platform's pack action plus NuGet Trusted Publishing (OIDC -> short-lived API key via
+# NuGet/login). This replaces the old @semantic-release/exec publish scripts; it runs as its own
+# job gated on _release.yaml producing a version, so publishing is no longer coupled into the
+# semantic-release step. dotnet-publish-nuget uses --skip-duplicate, so re-runs are safe.
+name: Publish NuGet Package
+
+run-name: Publish Hosting.Extensions.1Password packages ${{ inputs.version }}
+
+permissions: {}
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: "Runner pool"
+        required: false
+        type: choice
+        options:
+          - daedalus
+          - arkanis-runners
+          - ubuntu-latest
+        default: daedalus
+      version:
+        description: "Semantic-release version to apply before packing"
+        required: true
+        type: string
+      environment_name:
+        description: "GitHub environment that represents the NuGet deployment"
+        required: false
+        type: environment
+        default: publish-nuget
+  workflow_call:
+    inputs:
+      runner:
+        description: "Runner pool"
+        required: false
+        type: string
+        default: daedalus
+      version:
+        description: "Semantic-release version to apply before packing"
+        required: true
+        type: string
+      environment_name:
+        description: "GitHub environment that represents the NuGet deployment"
+        required: false
+        type: string
+        default: publish-nuget
+    secrets:
+      NUGET_USER:
+        required: false
+        description: "NuGet profile or organization name used by NuGet/login for Trusted Publishing"
+
+jobs:
+  publish:
+    name: Packages ${{ inputs.version }} @ ${{ inputs.environment_name }}
+    runs-on: ${{ inputs.runner }}
+    environment: ${{ inputs.environment_name }}
+    concurrency:
+      group: publish-nuget-${{ inputs.environment_name }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write # for NuGet Trusted Publishing OIDC token issuance
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Pack Hosting.Extensions.1Password @ ${{ inputs.version }}
+        uses: ArkanisCorporation/ci/.github/actions/dotnet-pack-nuget@v1
+        with:
+          project: src/Hosting.Extensions.1Password/Hosting.Extensions.1Password.csproj
+          version: ${{ inputs.version }}
+          global-json-file: global.json
+          runs-on-json: ${{ format('[{0}]', toJSON(inputs.runner)) }}
+          runs-on-self-hosted: ${{ inputs.runner != 'ubuntu-latest' }}
+
+      - name: Pack Aspire.Hosting.Extensions.1Password @ ${{ inputs.version }}
+        uses: ArkanisCorporation/ci/.github/actions/dotnet-pack-nuget@v1
+        with:
+          project: src/Aspire.Hosting.Extensions.1Password/Aspire.Hosting.Extensions.1Password.csproj
+          version: ${{ inputs.version }}
+          global-json-file: global.json
+          runs-on-json: ${{ format('[{0}]', toJSON(inputs.runner)) }}
+          runs-on-self-hosted: ${{ inputs.runner != 'ubuntu-latest' }}
+
+      - name: Validate NuGet user
+        env:
+          NUGET_USER: ${{ secrets.NUGET_USER || vars.NUGET_USER }}
+        run: |
+          if [[ -z "$NUGET_USER" ]]; then
+            echo "NUGET_USER secret or variable is required for NuGet Trusted Publishing." >&2
+            exit 2
+          fi
+        shell: bash
+
+      - name: NuGet Trusted Publishing login
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER || vars.NUGET_USER }}
+
+      - name: Publish packages @ ${{ inputs.version }}
+        uses: ArkanisCorporation/ci/.github/actions/dotnet-publish-nuget@v1
+        with:
+          api-key: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+          package-directory: artifacts/nuget

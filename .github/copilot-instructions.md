@@ -415,15 +415,16 @@ namespace Arkanis.Hosting.Extensions._1Password
 
 ## Scripts and Automation
 
-The `scripts/` directory contains Bash scripts for release automation:
-- `common.sh` - Shared functions
-- `common-verify.sh` - Common verification steps
-- `common-publish.sh` - Common publishing logic
-- `release-10-verify.sh` - Pre-release verification
-- `release-11-verify-nuget.sh` - NuGet package verification
-- `release-20-prepare.sh` - Prepare release
-- `release-30-publish.sh` - Publish release
-- `release-31-publish-nuget.sh` - Publish to NuGet
+Release automation lives in the CI workflows, not in repo-local scripts. The `.github/workflows/`
+lanes consume the shared `ArkanisCorporation/ci` platform (reusable `wf-*` workflows and composite
+actions pinned at `@v1`):
+- `build.yaml` - orchestrates lint, test, release verification, NuGet verify/publish, backpropagation
+- `_test.yaml` - `wf-dotnet-test.yml` (restore, build, test, coverage)
+- `_verify-release.yaml` / `_release.yaml` - `wf-verify-release-semantic.yml` / `wf-release-semantic.yml` (semantic-release dry run / real release)
+- `_verify-nuget-package.yaml` / `_publish-nuget-package.yaml` - pack both packages and publish via NuGet Trusted Publishing (`dotnet-pack-nuget` / `dotnet-publish-nuget`)
+- `_release-backpropagation.yaml` - `wf-release-backpropagation.yml` (merge the release version back to the default branch)
 
-These scripts are for maintainers and should not be modified without understanding the release process
+Packing and publishing are standalone jobs gated on the release version, not `@semantic-release/exec`
+steps; the platform's release workflow rejects the exec plugin. There are no longer any
+maintainer-run release scripts under `scripts/`.
 

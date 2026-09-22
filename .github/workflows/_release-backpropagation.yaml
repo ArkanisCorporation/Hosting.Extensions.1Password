@@ -1,0 +1,58 @@
+# Reusable release backpropagation lane.
+#
+# After a stable release, opens (and auto-merges + approves) a PR merging the release branch back
+# into the default branch so the bumped version travels home. Delegated to the shared ci
+# platform, replacing the inline gh-scripted backpropagation that used to live in _release.yaml.
+# Approval uses the repo's PR_AUTOMATION_PAT secret.
+name: Release Backpropagation
+
+permissions: {}
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        description: "Runner pool"
+        required: false
+        type: string
+        default: daedalus
+      environment_name:
+        description: "GitHub environment that provides PR_AUTOMATION_PAT"
+        required: false
+        type: string
+        default: release
+      new-version:
+        description: "Version that was published by semantic-release"
+        required: true
+        type: string
+      release-ref-name:
+        description: "Release branch name that should be merged back"
+        required: true
+        type: string
+      default-branch:
+        description: "Repository default branch that should receive the release version"
+        required: true
+        type: string
+    secrets:
+      PR_AUTOMATION_PAT:
+        description: "Token used to approve the backpropagation PR"
+        required: true
+
+jobs:
+  backpropagate:
+    name: Backpropagate ${{ inputs.new-version }}
+    uses: ArkanisCorporation/ci/.github/workflows/wf-release-backpropagation.yml@v1
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      runs-on: ${{ inputs.runner }}
+      runs-on-self-hosted: ${{ inputs.runner != 'ubuntu-latest' }}
+      environment-name: ${{ inputs.environment_name }}
+      new-version: ${{ inputs.new-version }}
+      release-ref-name: ${{ inputs.release-ref-name }}
+      default-branch: ${{ inputs.default-branch }}
+      auto-merge: true
+      approve: true
+    secrets:
+      PR_AUTOMATION_PAT: ${{ secrets.PR_AUTOMATION_PAT }}
