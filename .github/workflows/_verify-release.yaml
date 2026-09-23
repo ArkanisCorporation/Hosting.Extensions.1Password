@@ -1,0 +1,61 @@
+# Reusable release dry-run lane.
+#
+# Runs semantic-release in dry-run via the shared ci platform to compute the version that would
+# be published on this ref, without tagging or publishing. Its `new-version` output gates the
+# NuGet verify/publish and the real release job in build.yaml. Runs on pull requests too, so a
+# PR sees whether it would cut a release and that the package still builds.
+name: .NET Release Verification
+
+permissions: {}
+
+concurrency:
+  group: "verify-release-${{ github.ref }}"
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: "Runner pool (override to ubuntu-latest if self-hosted is broken)"
+        type: choice
+        options:
+          - daedalus
+          - arkanis-runners
+          - ubuntu-latest
+        default: daedalus
+  workflow_call:
+    inputs:
+      runner:
+        description: "Runner pool"
+        required: false
+        type: string
+        default: daedalus
+    outputs:
+      new-version:
+        description: "Version semantic-release would publish"
+        value: ${{ jobs.verify.outputs.new-version }}
+      new-tag:
+        description: "Tag semantic-release would publish"
+        value: ${{ jobs.verify.outputs.new-tag }}
+      new-channel:
+        description: "Release channel semantic-release would publish"
+        value: ${{ jobs.verify.outputs.new-channel }}
+      last-version:
+        description: "Previously published version"
+        value: ${{ jobs.verify.outputs.last-version }}
+      last-tag:
+        description: "Previous version tag"
+        value: ${{ jobs.verify.outputs.last-tag }}
+      release-published:
+        description: "Whether semantic-release would publish a release"
+        value: ${{ jobs.verify.outputs.release-published }}
+
+jobs:
+  verify:
+    name: Dry Run
+    uses: ArkanisCorporation/ci/.github/workflows/wf-verify-release-semantic.yml@v1
+    permissions:
+      contents: write
+    with:
+      runs-on: ${{ inputs.runner }}
+      runs-on-self-hosted: ${{ inputs.runner != 'ubuntu-latest' }}

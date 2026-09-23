@@ -1,0 +1,59 @@
+# Reusable NuGet package verification lane.
+#
+# Cold-builds each publishable package at the candidate release version via the shared ci
+# platform, without publishing. This repo ships two packages, so the job fans out over both
+# projects. Gated in build.yaml on verify-release producing a version.
+name: Verify NuGet Package
+
+run-name: Verify Hosting.Extensions.1Password packages ${{ inputs.version }}
+
+permissions: {}
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: "Runner pool"
+        required: false
+        type: choice
+        options:
+          - daedalus
+          - arkanis-runners
+          - ubuntu-latest
+        default: daedalus
+      version:
+        description: "Version used for package verification"
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      runner:
+        description: "Runner pool"
+        required: false
+        type: string
+        default: daedalus
+      version:
+        description: "Version used for package verification"
+        required: true
+        type: string
+
+jobs:
+  verify:
+    name: ${{ matrix.package }} ${{ inputs.version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: Hosting.Extensions.1Password
+            project: src/Hosting.Extensions.1Password/Hosting.Extensions.1Password.csproj
+          - package: Aspire.Hosting.Extensions.1Password
+            project: src/Aspire.Hosting.Extensions.1Password/Aspire.Hosting.Extensions.1Password.csproj
+    uses: ArkanisCorporation/ci/.github/workflows/wf-verify-publish-nuget.yml@v1
+    permissions:
+      contents: read
+    with:
+      runs-on: ${{ inputs.runner }}
+      runs-on-self-hosted: ${{ inputs.runner != 'ubuntu-latest' }}
+      project: ${{ matrix.project }}
+      version: ${{ inputs.version }}
+      global-json-file: global.json

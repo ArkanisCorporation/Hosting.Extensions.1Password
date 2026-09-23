@@ -1,7 +1,13 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
+# Reusable .NET test lane.
+#
+# Wraps the shared ci platform's reusable test workflow instead of hand-rolling
+# actions/setup-dotnet + the NuGet actions cache. On the self-hosted daedalus pool the
+# platform's setup-dotnet composite detects ARKANIS_PERSISTENT_NUGET_PACKAGES=true and skips
+# the NuGet actions cache entirely (the global-packages folder already lives on persistent
+# per-worker disk), which the old hand-rolled `cache: true` defeated and mis-keyed (ARK-579).
 name: .NET Test
+
+permissions: {}
 
 concurrency:
   group: "test-${{ github.ref }}"
@@ -17,35 +23,17 @@ on:
         default: daedalus
 
 jobs:
-  test:
-    runs-on: ${{ inputs.runner }}
-    steps:
-      -   name: Git checkout
-          uses: actions/checkout@v7
-
-      # Caches NuGet's default global-packages folder. Do not point NUGET_PACKAGES at the
-      # workspace to shrink it: the cache `version` is a hash of the literal path, and every
-      # daedalus replica has its own workspace, so that split the cache into one namespace per
-      # replica, each ageing on its own until a stale one broke restores outright (ARK-502).
-      -   name: Setup .NET
-          id: setup-dotnet
-          uses: actions/setup-dotnet@v6
-          with:
-            cache: true
-            cache-dependency-path: "**/packages.lock.json"
-
-      -   run: echo "Using .NET ${{ steps.setup-dotnet.outputs.dotnet-version }}"
-
-      -   run: echo "Cache hit - ${{ steps.setup-dotnet.outputs.cache-hit }}"
-
-      -   name: Restore dependencies
-          run: dotnet tool restore
-
-      -   name: Restore dependencies
-          run: dotnet restore --locked-mode
-
-      -   name: Build solution
-          run: dotnet build --no-restore
-
-      -   name: Test solution
-          run: dotnet test --no-build --verbosity normal --filter "Category!=Integration"
+  coverage:
+    name: Coverage
+    uses: ArkanisCorporation/ci/.github/workflows/wf-dotnet-test.yml@v1
+    permissions:
+      contents: read
+      pull-requests: write # for the single updated coverage comment on pull requests
+    with:
+      runs-on: ${{ inputs.runner }}
+      runs-on-self-hosted: ${{ inputs.runner != 'ubuntu-latest' }}
+      global-json-file: global.json
+      solution: Hosting.Extensions.1Password.slnx
+      # Integration tests require a live 1Password setup and are excluded from CI, matching the
+      # previous hand-rolled `dotnet test --filter "Category!=Integration"` step.
+      test-filter: "Category!=Integration"
