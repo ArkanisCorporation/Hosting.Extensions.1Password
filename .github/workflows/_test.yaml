@@ -37,3 +37,20 @@ jobs:
       # Integration tests require a live 1Password setup and are excluded from CI, matching the
       # previous hand-rolled `dotnet test --filter "Category!=Integration"` step.
       test-filter: "Category!=Integration"
+
+  format:
+    name: Format
+    uses: ArkanisCorporation/ci/.github/workflows/wf-dotnet-format.yml@v1
+    permissions:
+      contents: read
+      packages: read # requested by wf-dotnet-format's job; a called workflow cannot exceed the caller's grant
+    with:
+      runs-on: ${{ inputs.runner }}
+      runs-on-self-hosted: ${{ inputs.runner != 'ubuntu-latest' }}
+      global-json-file: global.json
+      solution: Hosting.Extensions.1Password.slnx
+      # JetBrains CleanupCode is the authoritative formatter, same as Aspire.Hosting.Extensions.Kubernetes.
+      # dotnet format stays off: it still reports analyzer style diagnostics on existing code.
+      run-dotnet-format: false
+      install-tool: true
+      timeout-minutes: 20
