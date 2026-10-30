@@ -84,7 +84,7 @@ public class OnePasswordHelperTests : IDisposable
         OnePasswordHelper.InvokerFactory = () => captured;
 
         // Act
-        await builder.Use1PasswordAsync(account: "acct-1");
+        await builder.Use1PasswordAsync("acct-1");
 
         // Assert
         Assert.Equal((string?)"acct-1", captured.CapturedAccount);
@@ -124,9 +124,7 @@ public class OnePasswordHelperTests : IDisposable
         OnePasswordHelper.InvokerFactory = () => fakeInvoker;
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<OnePasswordResultException>(
-            async () => await builder.Use1PasswordAsync()
-        );
+        var exception = await Assert.ThrowsAsync<OnePasswordResultException>(async () => await builder.Use1PasswordAsync());
 
         Assert.Contains("malformed output", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("malformed-line-without-equals", exception.Message);
@@ -168,13 +166,11 @@ public class OnePasswordHelperTests : IDisposable
         var config = new Dictionary<string, string?> { ["SecretE"] = "op://e" };
 
         var builder = new FakeHostApplicationBuilder(config);
-        var fakeInvoker = new FakeOpCliInvokerWithError(exitCode: 1, stderr: "CLI error message");
+        var fakeInvoker = new FakeOpCliInvokerWithError(1, "CLI error message");
         OnePasswordHelper.InvokerFactory = () => fakeInvoker;
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<OnePasswordCliException>(
-            async () => await builder.Use1PasswordAsync()
-        );
+        var exception = await Assert.ThrowsAsync<OnePasswordCliException>(async () => await builder.Use1PasswordAsync());
 
         Assert.Equal(1, exception.ExitCode);
         Assert.Equal((string?)"CLI error message", exception.StandardError);
@@ -190,7 +186,7 @@ public class OnePasswordHelperTests : IDisposable
         var config = new Dictionary<string, string?> { ["SecretE"] = "op://e" };
 
         var builder = new FakeHostApplicationBuilder(config);
-        var fakeInvoker = new FakeOpCliInvokerWithError(exitCode: 1, stderr: "CLI error message");
+        var fakeInvoker = new FakeOpCliInvokerWithError(1, "CLI error message");
         OnePasswordHelper.InvokerFactory = () => fakeInvoker;
 
         // Act

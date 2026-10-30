@@ -47,11 +47,14 @@ await app.RunAsync();
 static string? MaskSecret(string? secret)
 {
     if (string.IsNullOrEmpty(secret))
+    {
         return secret;
+    }
 
     if (secret.Length <= 4)
+    {
         return "****";
+    }
 
     return secret[..4] + new string('*', secret.Length - 4);
 }
-

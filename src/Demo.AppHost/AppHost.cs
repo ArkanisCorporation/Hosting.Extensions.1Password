@@ -6,7 +6,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 // bulk in-place secret resolution
 await builder.Use1PasswordAsync("my.1password.com");
-builder.AddParameter("ConnectionString", secret: true);
+builder.AddParameter("ConnectionString", true);
 // or
 builder.Add1PasswordParameter("ConnectionString2", "op://Private/DummyCredential/password", "my.1password.com");
 
@@ -18,17 +18,22 @@ builder.Add1PasswordParameter(
 );
 
 await builder.Use1PasswordAsync(options =>
-{
-    options.ConfigurationSectionItemSchema = "op-company://";
-    options.Account = "my.1password.com"; // replace with company-specific account if needed
-});
-builder.AddParameter("ConnectionString-Company", secret: true);
+    {
+        options.ConfigurationSectionItemSchema = "op-company://";
+        options.Account = "my.1password.com"; // replace with company-specific account if needed
+    }
+);
+builder.AddParameter("ConnectionString-Company", true);
 // or
-builder.Add1PasswordParameter("ConnectionString2-company", "op-company://Private/DummyCredential/password", configureOptions: options =>
-{
-    options.ConfigurationSectionItemSchema = "op-company://";
-    options.Account = "my.1password.com"; // replace with company-specific account if needed
-});
+builder.Add1PasswordParameter(
+    "ConnectionString2-company",
+    "op-company://Private/DummyCredential/password",
+    configureOptions: options =>
+    {
+        options.ConfigurationSectionItemSchema = "op-company://";
+        options.Account = "my.1password.com"; // replace with company-specific account if needed
+    }
+);
 
 const string companySchema = "op-company://";
 builder.Add1PasswordParameter(
