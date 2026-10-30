@@ -7,7 +7,8 @@
 # per-worker disk), which the old hand-rolled `cache: true` defeated and mis-keyed (ARK-579).
 name: .NET Test
 
-permissions: {}
+permissions:
+  contents: read
 
 concurrency:
   group: "test-${{ github.ref }}"

@@ -24,7 +24,8 @@ on:
           - ubuntu-latest
         default: daedalus
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
   lint-workflows:

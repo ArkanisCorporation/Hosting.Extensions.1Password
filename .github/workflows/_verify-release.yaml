@@ -6,7 +6,8 @@
 # PR sees whether it would cut a release and that the package still builds.
 name: .NET Release Verification
 
-permissions: {}
+permissions:
+  contents: read
 
 concurrency:
   group: "verify-release-${{ github.ref }}"

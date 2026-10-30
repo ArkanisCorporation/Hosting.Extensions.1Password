@@ -9,7 +9,8 @@ name: Publish NuGet Package
 
 run-name: Publish Hosting.Extensions.1Password packages ${{ inputs.version }}
 
-permissions: {}
+permissions:
+  contents: read
 
 on:
   workflow_dispatch:
