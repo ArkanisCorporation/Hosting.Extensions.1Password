@@ -28,6 +28,7 @@ jobs:
     uses: ArkanisCorporation/ci/.github/workflows/wf-dotnet-test.yml@v1
     permissions:
       contents: read
+      packages: read # requested by wf-dotnet-test's job; a called workflow cannot exceed the caller's grant
       pull-requests: write # for the single updated coverage comment on pull requests
     with:
       runs-on: ${{ inputs.runner }}
