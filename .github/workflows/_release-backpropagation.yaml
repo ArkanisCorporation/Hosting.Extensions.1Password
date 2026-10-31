@@ -6,7 +6,8 @@
 # Approval uses the repo's PR_AUTOMATION_PAT secret.
 name: Release Backpropagation
 
-permissions: {}
+permissions:
+  contents: read
 
 on:
   workflow_call:

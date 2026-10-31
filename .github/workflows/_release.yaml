@@ -7,7 +7,8 @@
 # exec-driven pack/publish scripts were removed from .releaserc.json.
 name: .NET Release
 
-permissions: {}
+permissions:
+  contents: read
 
 concurrency:
   group: "release-${{ github.ref }}"
