@@ -23,6 +23,14 @@ Thank you for your interest in contributing to Hosting.Extensions.1Password! We 
    dotnet restore
    ```
 
+   **Install Git Hooks** ([Husky.NET](https://alirezanet.github.io/Husky.Net/))
+   ```bash
+   dotnet tool restore
+   dotnet husky install
+   ```
+   The `commit-msg` hook rejects commit subjects that are not [Conventional Commits](https://www.conventionalcommits.org/).
+   Tasks live in [`.husky/task-runner.json`](.husky/task-runner.json); `dotnet husky run --name dotnet-format` applies `dotnet format` on demand.
+
 3. **Build the Solution**
    ```bash
    dotnet build
