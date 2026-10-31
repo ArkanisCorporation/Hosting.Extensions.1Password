@@ -21,7 +21,7 @@ internal static class TestHelpers
     /// <param name="values">The configuration values to initialize with.</param>
     /// <returns>A fake host application builder.</returns>
     public static FakeHostApplicationBuilder CreateHostApplicationBuilder(IDictionary<string, string?> values)
-        => new FakeHostApplicationBuilder(values);
+        => new(values);
 }
 
 /// <summary>

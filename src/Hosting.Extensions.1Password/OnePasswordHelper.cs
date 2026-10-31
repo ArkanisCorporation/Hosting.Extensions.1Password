@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using CliWrap.Buffered;
 using Microsoft.Extensions.Configuration;
 
-
 internal static class OnePasswordHelper
 {
     /// <summary>
