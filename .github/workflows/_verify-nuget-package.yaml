@@ -52,6 +52,7 @@ jobs:
     uses: ArkanisCorporation/ci/.github/workflows/wf-verify-publish-nuget.yml@v1
     permissions:
       contents: read
+      packages: read # requested by wf-verify-publish-nuget's job
     with:
       runs-on: ${{ inputs.runner }}
       runs-on-self-hosted: ${{ inputs.runner != 'ubuntu-latest' }}
