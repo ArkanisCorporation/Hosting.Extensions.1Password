@@ -45,7 +45,8 @@ public static class OnePasswordAspireHostingExtension
                 {
                     options.Account = account;
                     options.FailSilently = failSilently;
-                });
+                }
+            );
 
         /// <summary>
         /// Adds a parameter to the distributed application whose value is retrieved from 1Password using the specified 1Password key.
@@ -68,9 +69,7 @@ public static class OnePasswordAspireHostingExtension
             configureOptions?.Invoke(options);
 
             var parameter = builder.AddParameter(key, ValueGetter, publishValueAsDefault, secret);
-            parameter.Resource.Annotations.Add(
-                new OnePasswordParameterReferenceAnnotation(onePasswordKey, options.ConfigurationSectionItemSchema)
-            );
+            parameter.Resource.Annotations.Add(new OnePasswordParameterReferenceAnnotation(onePasswordKey, options.ConfigurationSectionItemSchema));
 
             return parameter;
 
@@ -95,10 +94,11 @@ public static class OnePasswordAspireHostingExtension
         [PublicAPI]
         public async Task<IDistributedApplicationBuilder> Use1PasswordAsync(string? account = null, bool failSilently = false)
             => await builder.Use1PasswordAsync(options =>
-            {
-                options.Account = account;
-                options.FailSilently = failSilently;
-            });
+                {
+                    options.Account = account;
+                    options.FailSilently = failSilently;
+                }
+            );
 
         /// <summary>
         /// Uses 1Password to inject secrets into the application's configuration.
@@ -127,11 +127,11 @@ public static class OnePasswordAspireHostingExtension
         /// <inheritdoc cref="Use1PasswordAsync(IDistributedApplicationBuilder,string,bool)" />
         [PublicAPI]
         public IDistributedApplicationBuilder Use1Password(string? account = null, bool failSilently = false)
-            => builder.Use1PasswordAsync(account: account, failSilently: failSilently).GetAwaiter().GetResult();
+            => builder.Use1PasswordAsync(account, failSilently).GetAwaiter().GetResult();
 
         /// <inheritdoc cref="Use1PasswordAsync(IDistributedApplicationBuilder,Action{OnePasswordOptions})" />
         [PublicAPI]
         public IDistributedApplicationBuilder Use1Password(Action<OnePasswordOptions> configureOptions)
-            => builder.Use1PasswordAsync(configureOptions: configureOptions).GetAwaiter().GetResult();
+            => builder.Use1PasswordAsync(configureOptions).GetAwaiter().GetResult();
     }
 }

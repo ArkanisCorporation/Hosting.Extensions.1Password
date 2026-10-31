@@ -28,10 +28,11 @@ public static class OnePasswordHostingExtension
     [PublicAPI]
     public static async Task<IHostApplicationBuilder> Use1PasswordAsync(this IHostApplicationBuilder builder, string? account = null, bool failSilently = false)
         => await builder.Use1PasswordAsync(options =>
-        {
-            options.Account = account;
-            options.FailSilently = failSilently;
-        });
+            {
+                options.Account = account;
+                options.FailSilently = failSilently;
+            }
+        );
 
     /// <summary>
     /// Uses 1Password to inject secrets into the application's configuration.
@@ -61,10 +62,10 @@ public static class OnePasswordHostingExtension
     /// <inheritdoc cref="Use1PasswordAsync(IHostApplicationBuilder,string,bool)" />
     [PublicAPI]
     public static IHostApplicationBuilder Use1Password(this IHostApplicationBuilder builder, string? account = null, bool failSilently = false)
-        => builder.Use1PasswordAsync(account: account, failSilently: failSilently).GetAwaiter().GetResult();
+        => builder.Use1PasswordAsync(account, failSilently).GetAwaiter().GetResult();
 
     /// <inheritdoc cref="Use1PasswordAsync(IHostApplicationBuilder,Action{OnePasswordOptions})" />
     [PublicAPI]
     public static IHostApplicationBuilder Use1Password(this IHostApplicationBuilder builder, Action<OnePasswordOptions> configureOptions)
-        => builder.Use1PasswordAsync(configureOptions: configureOptions).GetAwaiter().GetResult();
+        => builder.Use1PasswordAsync(configureOptions).GetAwaiter().GetResult();
 }
