@@ -1,0 +1,16 @@
+{
+   "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+   "tasks": [
+       {
+           "name": "commit-message-linter",
+           "group": "commit-msg",
+           "command": "dotnet",
+           "args": [ "husky", "exec", ".husky/scripts/commit-lint.csx", "--args", "${args}" ]
+       },
+       {
+           "name": "dotnet-format",
+           "command": "dotnet",
+           "args": [ "format", "Hosting.Extensions.1Password.slnx", "--verbosity", "diagnostic", "--no-restore" ]
+       }
+   ]
+}
